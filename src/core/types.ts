@@ -53,3 +53,10 @@ export interface Container {
     readonly users: UserRepository;
     readonly nfts: NFTRepository;
 }
+
+export type AuthContextType = 'user' | 'system';
+
+export interface AuthContext {
+    _id: string;
+    type?: AuthContextType;
+}
