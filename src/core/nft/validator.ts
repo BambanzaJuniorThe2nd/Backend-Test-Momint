@@ -1,3 +1,3 @@
 import { ValidatesNFTs } from '../types';
 
-export class UserValidator implements ValidatesNFTs {}
+export class NFTValidator implements ValidatesNFTs {}

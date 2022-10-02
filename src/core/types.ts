@@ -1,3 +1,5 @@
+import { Db } from 'mongodb';
+
 export interface CoreConfig {
     baseUrl: string;
     dbUrl: string;
@@ -35,14 +37,17 @@ export interface AccessToken extends HasTimestamp, HasId {
     expiryDate: Date;
 }
 
-export interface NFTRepository {
-    indexesCreated: boolean;
-    createIndexes(): Promise<void>;
-}
+export interface NFTRepository {}
 
 export interface ValidatesNFTs {}
 
 export interface NFT {}
+
+export interface ManagesDbs {
+    initialize(): Promise<void>;
+    mainDb(): Db;
+    db(name: string): Db;
+}
 
 export interface Container {
     readonly users: UserRepository;
