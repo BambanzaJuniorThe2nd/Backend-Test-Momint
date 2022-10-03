@@ -1,8 +1,4 @@
-import { 
-    NFT,
-    NFTRepository,
-    ValidatesNFTs,
-} from '../types';
+import { NFT, NFTRepository, ValidatesNFTs } from '../types';
 import {
     ManagesDbs,
     util,

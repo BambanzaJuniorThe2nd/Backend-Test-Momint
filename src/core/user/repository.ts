@@ -1,9 +1,5 @@
 import { DateTime } from 'luxon';
-import { 
-    User,
-    UserRepository,
-    ValidatesUsers,
-} from '../types';
+import { User, UserRepository, ValidatesUsers } from '../types';
 import {
     util,
     CoreError,
@@ -22,14 +18,15 @@ const TOKEN_COLL = 'access_tokens';
  * @param rawUser raw user from database
  */
  const getSafeUser = (rawUser: any): User => {
-    const { _id, email, name, createdAt, updatedAt } = rawUser;
-    return {
-        _id,
-        name,
-        email,
-        createdAt,
-        updatedAt
-    };
+    // const { _id, email, name, createdAt, updatedAt } = rawUser;
+    // return {
+    //     _id,
+    //     name,
+    //     email,
+    //     createdAt,
+    //     updatedAt
+    // };
+    return rawUser;
 };
 
 export class Users implements UserRepository {

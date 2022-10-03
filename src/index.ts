@@ -1,4 +1,4 @@
-import { Logger, transports } from 'winston';
+import { createLogger, transports } from 'winston';
 import { bootstrap as bootstrapCore, CoreConfig } from './core';
 import { createServer, startServer, ServerConfig } from './server';
 import { mountApi, RestConfig } from './rest';
@@ -11,7 +11,7 @@ interface SuperConfig extends CoreConfig, ServerConfig, RestConfig {
 
 }
 
-const logger = new Logger({
+const logger = createLogger({
     transports: [
         new transports.Console()
     ]
@@ -41,7 +41,7 @@ const start = async () => {
         mountApi(expressServer, core, config);
         logger.info('REST API mounted on /api');
         await startServer(expressServer, config);
-        logger.info('Server started on port', config.port);
+        logger.info('Server started on port: ' + config.port);
         logger.info('App is ready');
     }
     catch (e) {

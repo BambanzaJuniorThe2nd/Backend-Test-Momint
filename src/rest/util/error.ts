@@ -1,4 +1,4 @@
-import { ApiResponse, ApiMessage, StatusCode } from "..";
+import { ApiResponse, ApiMessage, StatusCode } from '..';
 
 /**
  * creates an error response body

@@ -1,4 +1,4 @@
-import { ApiRequest, ApiResponse, ApiNextFunction, StatusCode } from "..";
+import { ApiRequest, ApiResponse, ApiNextFunction, StatusCode } from '..';
 import { sendErrorResponse, sendServerError } from '../util';
 import { ErrorCode } from '../../core';
 
