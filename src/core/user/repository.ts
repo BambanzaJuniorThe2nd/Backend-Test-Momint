@@ -16,6 +16,22 @@ import { Db, Collection, FindOptions } from 'mongodb';
 const COLLECTION = 'users';
 const TOKEN_COLL = 'access_tokens';
 
+/**
+ * returns the user object with "secret"
+ * properties removed
+ * @param rawUser raw user from database
+ */
+ const getSafeUser = (rawUser: any): User => {
+    const { _id, email, name, createdAt, updatedAt } = rawUser;
+    return {
+        _id,
+        name,
+        email,
+        createdAt,
+        updatedAt
+    };
+};
+
 export class Users implements UserRepository {
     readonly db: Db;
     readonly validator: ValidatesUsers;
@@ -53,6 +69,50 @@ export class Users implements UserRepository {
             this._indexesCreated = true;
         }
         catch (e) {
+            throw new CoreError(e.message, ErrorCode.DB_ERROR);
+        }
+    }
+
+    /**
+     * helper to check whether token is in valid format
+     * @param token access token
+     * @throws INVALID_ACCESS_TOKEN token format is invalid or not given
+     */
+     private validateToken (token: string) {
+        if (!token) {
+            throw new CoreError(
+                messages.ERROR_ACCESS_TOKEN_REQUIRED, ErrorCode.INVALID_ACCESS_TOKEN);
+        }
+        if (typeof token !== 'string' || !util.isToken(token)) {
+            throw new CoreError(
+                messages.ERROR_ACCESS_TOKEN_INVALID, ErrorCode.INVALID_ACCESS_TOKEN);
+        }
+    }
+
+    /**
+     * fetch user who owns the specified access token, if the
+     * token is valid
+     * @param tokenId access token
+     * @throws VALIDATION_ERROR, INVALID_ACCESS_TOKEN and DB_ERROR
+     */
+     async getByToken(tokenId: string): Promise<User> {
+        this.validateToken(tokenId);
+        try {
+            const options = <FindOptions>{ projection: { userId: 1} };
+            const token = await this.tokenCollection.findOne(
+                {_id: tokenId, expiryDate: {$gte: new Date()}}, options);
+            if (!token) {
+                throw new CoreError(
+                    messages.ERROR_ACCESS_TOKEN_INVALID, ErrorCode.INVALID_ACCESS_TOKEN);
+            }
+            const userId = token.userId;
+            const user = await this.collection.findOne({_id: userId});
+            return getSafeUser(user);
+        }
+        catch (e) {
+            if (e instanceof CoreError) {
+                throw e;
+            }
             throw new CoreError(e.message, ErrorCode.DB_ERROR);
         }
     }

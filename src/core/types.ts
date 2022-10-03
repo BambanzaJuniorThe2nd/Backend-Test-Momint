@@ -5,23 +5,20 @@ export interface CoreConfig {
     dbUrl: string;
     dbMain: string;
     dbPrefix: string;
-    sampleHost: string;
-    samplePort: number;
-    sampleUser: string;
-    samplePassword: string;
-    sampleDatabase: string;
-    sampleConnection: string;
     clientBaseUrl: string;
 }
 
 export interface UserRepository {
     indexesCreated: boolean;
     createIndexes(): Promise<void>;
+    getByToken(tokenId: string): Promise<User>;
 }
 
 export interface ValidatesUsers {}
 
-export interface User {}
+export interface User extends HasId {
+
+}
 
 export interface HasId {
     _id: string;
