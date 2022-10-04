@@ -9,8 +9,7 @@ import {
 } from '..';
 import { Db, Collection, FindOptions } from 'mongodb';
 
-const COLLECTION = 'users';
-const TOKEN_COLL = 'access_tokens';
+const COLLECTION = 'nfts';
 
 export class NFTs implements NFTRepository {
     readonly dbManager: ManagesDbs;

@@ -16,12 +16,17 @@ export interface UserRepository {
 
 export interface ValidatesUsers {}
 
-export interface User extends HasId {
-
+export interface User extends HasId, HasName {
+    wallets: string[];
+    following?: string[];
 }
 
 export interface HasId {
     _id: string;
+}
+
+export interface HasName {
+    name: string;
 }
 
 export interface HasTimestamp {
@@ -38,7 +43,10 @@ export interface NFTRepository {}
 
 export interface ValidatesNFTs {}
 
-export interface NFT {}
+export interface NFT extends HasId, HasName {
+    description: string;
+    userId: string;
+}
 
 export interface ManagesDbs {
     initialize(): Promise<void>;
