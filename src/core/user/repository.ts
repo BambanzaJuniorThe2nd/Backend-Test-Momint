@@ -7,7 +7,7 @@ import {
     CoreMessage as messages,
     AccessToken
 } from '..';
-import { Db, Collection, FindOptions } from 'mongodb';
+import { Db, Collection, FindOptions, ObjectId } from 'mongodb';
 
 const COLLECTION = 'users';
 const TOKEN_COLL = 'access_tokens';
@@ -92,19 +92,32 @@ export class Users implements UserRepository {
      * @param tokenId access token
      * @throws VALIDATION_ERROR, INVALID_ACCESS_TOKEN and DB_ERROR
      */
-     async getByToken(tokenId: string): Promise<User> {
+    async getByToken(tokenId: string): Promise<User> {
         this.validateToken(tokenId);
         try {
             const options = <FindOptions>{ projection: { userId: 1} };
             const token = await this.tokenCollection.findOne(
-                {_id: tokenId, expiryDate: {$gte: new Date()}}, options);
+                {_id: new ObjectId(tokenId), expiryDate: {$gte: new Date()}}, options);
             if (!token) {
                 throw new CoreError(
                     messages.ERROR_ACCESS_TOKEN_INVALID, ErrorCode.INVALID_ACCESS_TOKEN);
             }
             const userId = token.userId;
-            const user = await this.collection.findOne({_id: userId});
+            const user = await this.collection.findOne({_id: new ObjectId(userId)});
             return getSafeUser(user);
+        }
+        catch (e) {
+            if (e instanceof CoreError) {
+                throw e;
+            }
+            throw new CoreError(e.message, ErrorCode.DB_ERROR);
+        }
+    }
+
+    async getAll(): Promise<User[]> {
+        try {
+            const result = await this.collection.find({});
+            return await result.toArray();
         }
         catch (e) {
             if (e instanceof CoreError) {

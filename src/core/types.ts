@@ -1,4 +1,4 @@
-import { Db } from 'mongodb';
+import { Db, ObjectId } from 'mongodb';
 
 export interface CoreConfig {
     baseUrl: string;
@@ -12,6 +12,7 @@ export interface UserRepository {
     indexesCreated: boolean;
     createIndexes(): Promise<void>;
     getByToken(tokenId: string): Promise<User>;
+    getAll(): Promise<User[]>;
 }
 
 export interface ValidatesUsers {}
@@ -22,7 +23,7 @@ export interface User extends HasId, HasName {
 }
 
 export interface HasId {
-    _id: string;
+    _id: ObjectId;
 }
 
 export interface HasName {
@@ -39,7 +40,9 @@ export interface AccessToken extends HasTimestamp, HasId {
     expiryDate: Date;
 }
 
-export interface NFTRepository {}
+export interface NFTRepository {
+    getAll(): Promise<NFT[]>;
+}
 
 export interface ValidatesNFTs {}
 
@@ -62,6 +65,6 @@ export interface Container {
 export type AuthContextType = 'user' | 'system';
 
 export interface AuthContext {
-    _id: string;
+    _id: ObjectId;
     type?: AuthContextType;
 }

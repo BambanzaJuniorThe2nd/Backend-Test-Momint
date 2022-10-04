@@ -8,6 +8,8 @@ nfts.get('/me', requireAuth(), (req: ApiRequest, res: ApiResponse, next: ApiNext
     res.send(req.user);
 });
 
-nfts.get('/all', requireAuth(), (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
-    res.send('Getting all nfts');
+nfts.get('/all', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
+    req.core.nfts.getAll()
+        .then((nfts) => res.status(StatusCode.SUCCESS).send(nfts))
+        .catch(next);
 });

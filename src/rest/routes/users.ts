@@ -11,6 +11,8 @@ users.get('/me', requireAuth(), (req: ApiRequest, res: ApiResponse, next: ApiNex
     res.send(req.user);
 });
 
-users.get('/all', requireAuth(), (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
-    res.send('Getting all nfts');
+users.get('/all', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
+    req.core.users.getAll()
+        .then((users) => res.status(StatusCode.SUCCESS).send(users))
+        .catch(next);
 });

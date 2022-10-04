@@ -23,4 +23,17 @@ export class NFTs implements NFTRepository {
         this.collection = this.db.collection(COLLECTION);
         this.validator = validator;
     }
+
+    async getAll(): Promise<NFT[]> {
+        try {
+            const result = await this.collection.find({});
+            return await result.toArray();
+        }
+        catch (e) {
+            if (e instanceof CoreError) {
+                throw e;
+            }
+            throw new CoreError(e.message, ErrorCode.DB_ERROR);
+        }
+    }
 }
