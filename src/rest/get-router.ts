@@ -17,8 +17,8 @@ export const getRouter = (core: Container) => {
     router.use(cors());
     router.use(injectCore(core));
 
-    router.use('/users', users);
-    router.use('/nfts', nfts);
+    router.use('/user', users);
+    router.use('/nft', nfts);
     router.use('/', root);
 
     router.use(errorHandler());
