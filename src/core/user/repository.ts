@@ -8,6 +8,7 @@ import {
     AccessToken
 } from '..';
 import { Db, Collection, FindOptions, ObjectId } from 'mongodb';
+import { Console } from 'console';
 
 const COLLECTION = 'users';
 const TOKEN_COLL = 'access_tokens';
@@ -129,9 +130,26 @@ export class Users implements UserRepository {
         }
     }
 
-    async getAllNftsByIdArgs(id: string, limit: number): Promise<NFT[]> {
+    async getAllNftsById(id: string, limit: number): Promise<NFT[]> {
         try {
             return await this.nfts.getAllByUserId(id, limit);
+        }
+        catch (e) {
+            if (e instanceof CoreError) {
+                throw e;
+            }
+            throw new CoreError(e.message, ErrorCode.DB_ERROR);
+        }
+    }
+
+    async getFeedById(id: string, limit: number): Promise<NFT[]> {
+        try {
+            const user = await this.collection.findOne({ _id: new ObjectId(id) });
+            if (!user) {
+                throw new CoreError(
+                    messages.ERROR_USER_NOT_FOUND, ErrorCode.DB_OP_FAILED);
+            }
+            return await this.nfts.getAllByUserIds(user.following ? user.following : [], limit);
         }
         catch (e) {
             if (e instanceof CoreError) {

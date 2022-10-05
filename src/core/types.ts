@@ -13,7 +13,8 @@ export interface UserRepository {
     createIndexes(): Promise<void>;
     getByToken(tokenId: string): Promise<User>;
     getAll(): Promise<User[]>;
-    getAllNftsByIdArgs(id: string, limit: number): Promise<NFT[]>;
+    getAllNftsById(id: string, limit: number): Promise<NFT[]>;
+    getFeedById(id: string, limit: number): Promise<NFT[]>;
 }
 
 export interface ValidatesUsers {}
@@ -44,6 +45,7 @@ export interface AccessToken extends HasTimestamp, HasId {
 export interface NFTRepository {
     getAll(): Promise<NFT[]>;
     getAllByUserId(userId: string, limit: number): Promise<NFT[]>;
+    getAllByUserIds(userIds: string[], limit: number): Promise<NFT[]>;
 }
 
 export interface ValidatesNFTs {}

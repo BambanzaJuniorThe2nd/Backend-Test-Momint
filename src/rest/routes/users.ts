@@ -17,10 +17,18 @@ users.get('/all', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => 
         .catch(next);
 });
 
-users.get('/:id/nfts', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
-    const id: string = req.params.id;
+users.get('/:userid/nfts', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
+    const id: string = req.params.userid;
     const limit: number = req.body.limit ? req.body.limit : 0;
-    req.core.users.getAllNftsByIdArgs(id, limit)
+    req.core.users.getAllNftsById(id, limit)
+        .then((nfts) => res.status(StatusCode.SUCCESS).send(nfts))
+        .catch(next);
+});
+
+users.get('/:userid/feed', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
+    const id: string = req.params.userid;
+    const limit: number = req.body.limit ? req.body.limit : 0;
+    req.core.users.getFeedById(id, limit)
         .then((nfts) => res.status(StatusCode.SUCCESS).send(nfts))
         .catch(next);
 });
