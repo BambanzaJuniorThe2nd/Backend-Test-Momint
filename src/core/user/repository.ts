@@ -129,9 +129,9 @@ export class Users implements UserRepository {
         }
     }
 
-    async getAllNftsBy(id: string): Promise<NFT[]> {
+    async getAllNftsByIdArgs(id: string, limit: number): Promise<NFT[]> {
         try {
-            return await this.nfts.getAllByUserId(id);
+            return await this.nfts.getAllByUserId(id, limit);
         }
         catch (e) {
             if (e instanceof CoreError) {

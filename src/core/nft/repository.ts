@@ -37,9 +37,9 @@ export class NFTs implements NFTRepository {
         }
     }
 
-    async getAllByUserId(userId: string): Promise<NFT[]> {
+    async getAllByUserId(userId: string, limit: number): Promise<NFT[]> {
         try {
-            const result = await this.collection.find({ userId: new ObjectId(userId) });
+            const result = await this.collection.find({ userId: new ObjectId(userId) }).limit(limit);
             return await result.toArray();
         }
         catch (e) {
