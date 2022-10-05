@@ -7,7 +7,7 @@ import {
     CoreMessage as messages,
     AccessToken
 } from '..';
-import { Db, Collection, FindOptions } from 'mongodb';
+import { Db, Collection, FindOptions, ObjectId } from 'mongodb';
 
 const COLLECTION = 'nfts';
 
@@ -27,6 +27,19 @@ export class NFTs implements NFTRepository {
     async getAll(): Promise<NFT[]> {
         try {
             const result = await this.collection.find({});
+            return await result.toArray();
+        }
+        catch (e) {
+            if (e instanceof CoreError) {
+                throw e;
+            }
+            throw new CoreError(e.message, ErrorCode.DB_ERROR);
+        }
+    }
+
+    async getAllByUserId(userId: string): Promise<NFT[]> {
+        try {
+            const result = await this.collection.find({ userId: new ObjectId(userId) });
             return await result.toArray();
         }
         catch (e) {

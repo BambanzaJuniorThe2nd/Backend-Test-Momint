@@ -16,3 +16,9 @@ users.get('/all', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => 
         .then((users) => res.status(StatusCode.SUCCESS).send(users))
         .catch(next);
 });
+
+users.get('/:id/nfts', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
+    req.core.users.getAllNftsBy(req.params.id)
+        .then((nfts) => res.status(StatusCode.SUCCESS).send(nfts))
+        .catch(next);
+});

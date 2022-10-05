@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { User, UserRepository, ValidatesUsers } from '../types';
+import { User, UserRepository, ValidatesUsers, NFTRepository, NFT } from '../types';
 import {
     util,
     CoreError,
@@ -34,13 +34,15 @@ export class Users implements UserRepository {
     readonly validator: ValidatesUsers;
     readonly collection: Collection<User>;
     readonly tokenCollection: Collection<AccessToken>;
+    readonly nfts: NFTRepository;
     private _indexesCreated: boolean;
 
-    constructor (db: Db, validator: ValidatesUsers) {
+    constructor (db: Db, validator: ValidatesUsers, nfts: NFTRepository) {
         this.db = db;
         this.validator = validator;
         this.collection = db.collection(COLLECTION);
         this.tokenCollection = db.collection(TOKEN_COLL);
+        this.nfts = nfts;
         this._indexesCreated = false;
     }
 
@@ -118,6 +120,18 @@ export class Users implements UserRepository {
         try {
             const result = await this.collection.find({});
             return await result.toArray();
+        }
+        catch (e) {
+            if (e instanceof CoreError) {
+                throw e;
+            }
+            throw new CoreError(e.message, ErrorCode.DB_ERROR);
+        }
+    }
+
+    async getAllNftsBy(id: string): Promise<NFT[]> {
+        try {
+            return await this.nfts.getAllByUserId(id);
         }
         catch (e) {
             if (e instanceof CoreError) {

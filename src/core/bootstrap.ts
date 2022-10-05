@@ -10,12 +10,13 @@ export const bootstrap = async (config: CoreConfig): Promise<Container> => {
         { prefix: config.dbPrefix, mainDb: config.dbMain });
     await dbManager.initialize();
 
-    const userValidator = new UserValidator();
-    const users = new Users(dbManager.mainDb(), userValidator);
-    await users.createIndexes();
-
+    // init nfts
     const nftValidator = new NFTValidator();
     const nfts = new NFTs(dbManager, nftValidator);
+
+    const userValidator = new UserValidator();
+    const users = new Users(dbManager.mainDb(), userValidator, nfts);
+    await users.createIndexes();
 
 
     return Object.freeze({
