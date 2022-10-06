@@ -144,12 +144,22 @@ export class Users implements UserRepository {
 
     async getFeedById(id: string, limit: number): Promise<NFT[]> {
         try {
-            const user = await this.collection.findOne({ _id: new ObjectId(id) });
-            if (!user) {
-                throw new CoreError(
-                    messages.ERROR_USER_NOT_FOUND, ErrorCode.DB_OP_FAILED);
-            }
-            return await this.nfts.getAllByUserIds(user.following ? user.following : [], limit);
+            const result = await this.collection.aggregate<{ feed: NFT[] }>([
+                { $match: { _id: new ObjectId(id) } },
+                {
+                    $graphLookup: {
+                        from: 'nfts',
+                        startWith: '$following',
+                        connectFromField: 'following',
+                        connectToField: 'userId',
+                        as: 'feed',
+                    }
+                },
+                { $project: { _id: 0, feed: 1 } }
+            ]);
+
+            const resultAsArray = await result.toArray();
+            return resultAsArray[0].feed;
         }
         catch (e) {
             if (e instanceof CoreError) {
