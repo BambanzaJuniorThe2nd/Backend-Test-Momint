@@ -13,8 +13,8 @@ export interface UserRepository {
     createIndexes(): Promise<void>;
     getByToken(tokenId: string): Promise<User>;
     getAll(): Promise<User[]>;
-    getAllNftsById(id: string, limit: number): Promise<NFT[]>;
-    getFeedById(id: string, limit: number): Promise<NFT[]>;
+    getNftsById(args: UserGetNFTsByIdArgs): Promise<NFT[]>;
+    getFeedById(args: UserGetFeedByIdArgs): Promise<NFT[]>;
 }
 
 export interface ValidatesUsers {}
@@ -72,3 +72,15 @@ export interface AuthContext {
     _id: ObjectId;
     type?: AuthContextType;
 }
+
+export interface Pagination {
+    skip?: number;
+    limit?: number;
+}
+
+export interface UserGetFeedByIdArgs {
+    id: string;
+    pagination: Pagination;
+}
+
+export interface UserGetNFTsByIdArgs extends UserGetFeedByIdArgs {}

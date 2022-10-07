@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { User, UserRepository, ValidatesUsers, NFTRepository, NFT } from '../types';
+import { User, UserRepository, ValidatesUsers, NFT, UserGetFeedByIdArgs, UserGetNFTsByIdArgs } from '../types';
 import {
     util,
     CoreError,
@@ -8,42 +8,22 @@ import {
     AccessToken
 } from '..';
 import { Db, Collection, FindOptions, ObjectId } from 'mongodb';
-import { Console } from 'console';
 
 const COLLECTION = 'users';
 const TOKEN_COLL = 'access_tokens';
-
-/**
- * returns the user object with "secret"
- * properties removed
- * @param rawUser raw user from database
- */
- const getSafeUser = (rawUser: any): User => {
-    // const { _id, email, name, createdAt, updatedAt } = rawUser;
-    // return {
-    //     _id,
-    //     name,
-    //     email,
-    //     createdAt,
-    //     updatedAt
-    // };
-    return rawUser;
-};
 
 export class Users implements UserRepository {
     readonly db: Db;
     readonly validator: ValidatesUsers;
     readonly collection: Collection<User>;
     readonly tokenCollection: Collection<AccessToken>;
-    readonly nfts: NFTRepository;
     private _indexesCreated: boolean;
 
-    constructor (db: Db, validator: ValidatesUsers, nfts: NFTRepository) {
+    constructor (db: Db, validator: ValidatesUsers) {
         this.db = db;
         this.validator = validator;
         this.collection = db.collection(COLLECTION);
         this.tokenCollection = db.collection(TOKEN_COLL);
-        this.nfts = nfts;
         this._indexesCreated = false;
     }
 
@@ -63,6 +43,8 @@ export class Users implements UserRepository {
      async createIndexes (): Promise<void> {
         if (this._indexesCreated) return;
         try {
+            await this.collection.createIndex({ _id: 1}, {});
+
             // ttl collection for access tokens expiry
             await this.tokenCollection.createIndex({ expiryDate: 1},
                 { expireAfterSeconds: 1 });
@@ -107,7 +89,7 @@ export class Users implements UserRepository {
             }
             const userId = token.userId;
             const user = await this.collection.findOne({_id: new ObjectId(userId)});
-            return getSafeUser(user);
+            return user;
         }
         catch (e) {
             if (e instanceof CoreError) {
@@ -130,9 +112,38 @@ export class Users implements UserRepository {
         }
     }
 
-    async getAllNftsById(id: string, limit: number): Promise<NFT[]> {
+    async getNftsById(args: UserGetNFTsByIdArgs): Promise<NFT[]> {
         try {
-            return await this.nfts.getAllByUserId(id, limit);
+            const { id, pagination: { skip } } = args;
+            const projectionStage = { $project: { _id: 0, nfts: 1 } };
+
+            const result = await this.collection.aggregate<{ nfts: NFT[] }>([
+                { $match: { _id: new ObjectId(id) } },
+                {
+                    $graphLookup: {
+                        from: 'nfts',
+                        startWith: '$_id',
+                        connectFromField: '_id',
+                        connectToField: 'userId',
+                        as: 'nfts',
+                    }
+                },
+                projectionStage,
+                { $unwind: { path: '$nfts' } },
+                { $sort: { 'nfts._id': 1 } },
+                { $skip: skip },
+                { $limit: 3 },
+                {
+                    $group: {
+                        _id: '$_id',
+                        nfts: { $push: '$nfts' }
+                    }
+                },
+                projectionStage
+            ]);
+
+            const result_array = await result.toArray();
+            return result_array[0].nfts;
         }
         catch (e) {
             if (e instanceof CoreError) {
@@ -142,8 +153,11 @@ export class Users implements UserRepository {
         }
     }
 
-    async getFeedById(id: string, limit: number): Promise<NFT[]> {
+    async getFeedById(args: UserGetFeedByIdArgs): Promise<NFT[]> {
         try {
+            const { id, pagination: { skip, limit } } = args;
+            const projectionStage = { $project: { _id: 0, feed: 1 } };
+
             const result = await this.collection.aggregate<{ feed: NFT[] }>([
                 { $match: { _id: new ObjectId(id) } },
                 {
@@ -155,11 +169,22 @@ export class Users implements UserRepository {
                         as: 'feed',
                     }
                 },
-                { $project: { _id: 0, feed: 1 } }
+                projectionStage,
+                { $unwind: { path: '$feed' } },
+                { $sort: { 'feed._id': 1 } },
+                { $skip: skip },
+                { $limit: limit },
+                {
+                    $group: {
+                        _id: '$_id',
+                        feed: { $push: '$feed' }
+                    }
+                },
+                projectionStage
             ]);
 
-            const resultAsArray = await result.toArray();
-            return resultAsArray[0].feed;
+            const result_array = await result.toArray();
+            return result_array[0].feed;
         }
         catch (e) {
             if (e instanceof CoreError) {

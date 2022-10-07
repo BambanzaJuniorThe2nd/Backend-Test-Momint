@@ -7,7 +7,7 @@ import {
     CoreMessage as messages,
     AccessToken
 } from '..';
-import { Db, Collection, FindOptions, ObjectId } from 'mongodb';
+import { Db, Collection, ObjectId } from 'mongodb';
 
 const COLLECTION = 'nfts';
 
@@ -16,12 +16,38 @@ export class NFTs implements NFTRepository {
     readonly db: Db;
     readonly collection: Collection<NFT>;
     readonly validator: ValidatesNFTs;
+    private _indexesCreated: boolean;
 
     constructor (dbManager: ManagesDbs, validator: ValidatesNFTs) {
         this.dbManager = dbManager;
         this.db = dbManager.mainDb();
         this.collection = this.db.collection(COLLECTION);
         this.validator = validator;
+        this._indexesCreated = false;
+    }
+
+    /**
+     * check whether indexes have been created
+     * on nfts collection
+     */
+     get indexesCreated (): boolean {
+        return this._indexesCreated;
+    }
+
+    /**
+     * creates required indexes on
+     * nfts collections
+     * @throws DB_ERROR
+     */
+     async createIndexes (): Promise<void> {
+        if (this._indexesCreated) return;
+        try {
+            await this.collection.createIndex({ _id: 1 }, {});
+            this._indexesCreated = true;
+        }
+        catch (e) {
+            throw new CoreError(e.message, ErrorCode.DB_ERROR);
+        }
     }
 
     async getAll(): Promise<NFT[]> {
