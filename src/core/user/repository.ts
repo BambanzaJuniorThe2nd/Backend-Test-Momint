@@ -120,6 +120,11 @@ export class Users implements UserRepository {
             const skipStage = skip ? { $skip: skip } : { $skip: 0 };
             const limitStage = limit ? { $limit: limit } : { $limit: 3 };
 
+            const user = await this.collection.findOne({ _id: new ObjectId(id) });
+            if (!user) {
+                throw new CoreError(messages.ERROR_USER_NOT_FOUND, ErrorCode.DB_OBJECT_NOT_FOUND);
+            }
+
             const result = await this.collection.aggregate<{ nfts: NFT[] }>([
                 { $match: { _id: new ObjectId(id) } },
                 {
@@ -163,6 +168,11 @@ export class Users implements UserRepository {
             const projectionStage = { $project: { _id: 0, feed: 1 } };
             const skipStage = skip ? { $skip: skip } : { $skip: 0 };
             const limitStage = limit ? { $limit: limit } : { $limit: 10 };
+
+            const user = await this.collection.findOne({ _id: new ObjectId(id) });
+            if (!user) {
+                throw new CoreError(messages.ERROR_USER_NOT_FOUND, ErrorCode.DB_OBJECT_NOT_FOUND);
+            }
 
             const result = await this.collection.aggregate<{ feed: NFT[] }>([
                 { $match: { _id: new ObjectId(id) } },
