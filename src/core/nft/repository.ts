@@ -126,6 +126,7 @@ export class NFTs implements NFTRepository {
     }
 
     async getOwnerById(id: string): Promise<NFTOwner> {
+        this.validator.validateGetOwnerById(id);
         try {
             // const result = await this.collection.find({ userId: { $in: userIds.map(userId => new ObjectId(userId)) } }).limit(limit);
             return await { blockchainOwner: 'owner', userId: 'user id' };

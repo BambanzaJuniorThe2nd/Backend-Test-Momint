@@ -52,7 +52,9 @@ export interface NFTRepository {
     getOwnerById(id: string): Promise<NFTOwner>;
 }
 
-export interface ValidatesNFTs {}
+export interface ValidatesNFTs {
+    validateGetOwnerById(id: string): void;
+}
 
 export interface NFT extends HasId, HasName {
     description: string;
