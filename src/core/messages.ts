@@ -19,4 +19,5 @@ export enum CoreMessage {
     ERROR_USER_NOT_FOUND = 'User could not be found',
     ERROR_NFT_NOT_FOUND = 'NFT could not be found',
     ERROR_NFT_WITHOUT_CONTRACT = 'NFT without contract details',
+    ERROR_USER_WITHOUT_FOLLOWING = 'User does not have follow anyone'
 }

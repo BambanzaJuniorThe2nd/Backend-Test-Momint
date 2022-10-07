@@ -174,6 +174,10 @@ export class Users implements UserRepository {
                 throw new CoreError(messages.ERROR_USER_NOT_FOUND, ErrorCode.DB_OBJECT_NOT_FOUND);
             }
 
+            if (!user.following) {
+                throw new CoreError(messages.ERROR_USER_WITHOUT_FOLLOWING, ErrorCode.AGGREGATION_FAILED);
+            }
+
             const result = await this.collection.aggregate<{ feed: NFT[] }>([
                 { $match: { _id: new ObjectId(id) } },
                 {
