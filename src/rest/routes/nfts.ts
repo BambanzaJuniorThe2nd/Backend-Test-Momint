@@ -15,8 +15,7 @@ nfts.get('/all', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
 });
 
 nfts.get('/:nftid/owner', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
-    const id = req.params.nftid;
-    req.core.nfts.getOwnerById(req.params.id)
+    req.core.nfts.getOwnerById(req.params.nftid)
         .then((owner) => res.status(StatusCode.SUCCESS).send(owner))
         .catch(next);
 });

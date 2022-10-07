@@ -1,4 +1,5 @@
 import { randomBytes } from 'crypto';
+import { ObjectId } from 'mongodb';
 import { CoreError, ErrorCode } from '../error';
 import { CoreMessage } from '../messages';
 
@@ -13,11 +14,11 @@ export const generateId = (): string => {
 };
 
 /**
- * checks whether the specified string is a valid id
+ * checks whether the specified string is a valid mongodb id
  * @param id string to check
  */
 export const isId = (id: string): boolean => {
-    return typeof id === 'string' && id !== '';
+    return typeof id === 'string' && id !== '' && ObjectId.isValid(id);
 };
 
 /**
