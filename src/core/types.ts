@@ -56,8 +56,20 @@ export interface ValidatesNFTs {
     validateGetOwnerById(id: string): void;
 }
 
+export interface Contract {
+    address: string;
+    blockchain: string;
+}
+
+export interface TokenId {
+    _hex: string;
+    _isBigNumber: boolean;
+}
+
 export interface NFT extends HasId, HasName {
     description: string;
+    contract?: Contract;
+    tokenId?: TokenId;
     userId: ObjectId;
 }
 

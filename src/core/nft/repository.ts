@@ -130,9 +130,13 @@ export class NFTs implements NFTRepository {
         try {
             const projectionStage = { $project: { _id: 0, feed: 1 } };
 
-            const nft = await this.collection.findOne({ _id: new ObjectId(id) });
+            const nft = await this.collection.findOne<NFT>({ _id: new ObjectId(id) });
             if (!nft) {
                 throw new CoreError(messages.ERROR_NFT_NOT_FOUND, ErrorCode.DB_OBJECT_NOT_FOUND);
+            }
+
+            if (!nft.contract || !nft.tokenId) {
+                throw new CoreError(messages.ERROR_NFT_WITHOUT_CONTRACT, ErrorCode.AGGREGATION_FAILED);
             }
             return await { blockchainOwner: 'owner', userId: 'user id' };
         }

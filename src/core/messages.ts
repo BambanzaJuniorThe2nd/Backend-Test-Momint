@@ -17,5 +17,6 @@ export enum CoreMessage {
     ERROR_ENTITY_UPDATE_FAILED = 'Entity update failed',
     ERROR_ACCOUNT_NOT_FOUND = 'Account not found',
     ERROR_USER_NOT_FOUND = 'User could not be found',
-    ERROR_NFT_NOT_FOUND = 'NFT could not be found'
+    ERROR_NFT_NOT_FOUND = 'NFT could not be found',
+    ERROR_NFT_WITHOUT_CONTRACT = 'NFT without contract details',
 }
