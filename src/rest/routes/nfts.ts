@@ -13,3 +13,10 @@ nfts.get('/all', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
         .then((nfts) => res.status(StatusCode.SUCCESS).send(nfts))
         .catch(next);
 });
+
+nfts.get('/:nftid/owner', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
+    const id = req.params.nftid;
+    req.core.nfts.getOwnerById(req.params.id)
+        .then((owner) => res.status(StatusCode.SUCCESS).send(owner))
+        .catch(next);
+});

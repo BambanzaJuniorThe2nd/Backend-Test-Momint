@@ -46,6 +46,7 @@ export interface NFTRepository {
     getAll(): Promise<NFT[]>;
     getAllByUserId(userId: string, limit: number): Promise<NFT[]>;
     getAllByUserIds(userIds: string[], limit: number): Promise<NFT[]>;
+    getOwnerById(id: string): Promise<NFTOwner>;
 }
 
 export interface ValidatesNFTs {}
@@ -84,3 +85,8 @@ export interface UserGetFeedByIdArgs {
 }
 
 export interface UserGetNFTsByIdArgs extends UserGetFeedByIdArgs {}
+
+export interface NFTOwner {
+    blockchainOwner: string
+	userId: string
+}
