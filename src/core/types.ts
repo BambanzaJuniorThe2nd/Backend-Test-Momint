@@ -17,7 +17,10 @@ export interface UserRepository {
     getFeedById(args: UserGetFeedByIdArgs): Promise<NFT[]>;
 }
 
-export interface ValidatesUsers {}
+export interface ValidatesUsers {
+    validateGetNftsById(args: UserGetNFTsByIdArgs): void;
+    validateGetFeedById(args: UserGetFeedByIdArgs): void;
+}
 
 export interface User extends HasId, HasName {
     wallets: string[];
@@ -87,6 +90,6 @@ export interface UserGetFeedByIdArgs {
 export interface UserGetNFTsByIdArgs extends UserGetFeedByIdArgs {}
 
 export interface NFTOwner {
-    blockchainOwner: string
-	userId: string
+    blockchainOwner: string;
+    userId: string;
 }

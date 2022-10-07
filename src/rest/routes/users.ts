@@ -15,8 +15,8 @@ users.get('/all', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => 
 
 users.get('/:userid/nfts', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
     const id: string = req.params.userid;
-    const skip: number = req.body.skip ? req.body.skip : 0;
-    const args = { id, pagination: { skip } };
+    const pagination = req.body;
+    const args = { id, pagination };
     req.core.users.getNftsById(args)
         .then((nfts) => res.status(StatusCode.SUCCESS).send(nfts))
         .catch(next);

@@ -113,9 +113,12 @@ export class Users implements UserRepository {
     }
 
     async getNftsById(args: UserGetNFTsByIdArgs): Promise<NFT[]> {
+        this.validator.validateGetNftsById(args);
         try {
-            const { id, pagination: { skip } } = args;
+            const { id, pagination: { skip, limit } } = args;
             const projectionStage = { $project: { _id: 0, nfts: 1 } };
+            const skipStage = skip ? { $skip: skip } : { $skip: 0 };
+            const limitStage = limit ? { $limit: limit } : { $limit: 3 };
 
             const result = await this.collection.aggregate<{ nfts: NFT[] }>([
                 { $match: { _id: new ObjectId(id) } },
@@ -131,8 +134,8 @@ export class Users implements UserRepository {
                 projectionStage,
                 { $unwind: { path: '$nfts' } },
                 { $sort: { 'nfts._id': 1 } },
-                { $skip: skip },
-                { $limit: 3 },
+                skipStage,
+                limitStage,
                 {
                     $group: {
                         _id: '$_id',
@@ -154,9 +157,12 @@ export class Users implements UserRepository {
     }
 
     async getFeedById(args: UserGetFeedByIdArgs): Promise<NFT[]> {
+        this.validator.validateGetFeedById(args);
         try {
             const { id, pagination: { skip, limit } } = args;
             const projectionStage = { $project: { _id: 0, feed: 1 } };
+            const skipStage = skip ? { $skip: skip } : { $skip: 0 };
+            const limitStage = limit ? { $limit: limit } : { $limit: 10 };
 
             const result = await this.collection.aggregate<{ feed: NFT[] }>([
                 { $match: { _id: new ObjectId(id) } },
