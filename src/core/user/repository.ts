@@ -178,8 +178,8 @@ export class Users implements UserRepository {
                 projectionStage,
                 { $unwind: { path: '$feed' } },
                 { $sort: { 'feed._id': 1 } },
-                { $skip: skip },
-                { $limit: limit },
+                skipStage,
+                limitStage,
                 {
                     $group: {
                         _id: '$_id',

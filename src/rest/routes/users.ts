@@ -14,19 +14,14 @@ users.get('/all', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => 
 });
 
 users.get('/:userid/nfts', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
-    const id: string = req.params.userid;
-    const pagination = req.body;
-    const args = { id, pagination };
+    const args = { id: req.params.userid, pagination: req.body };
     req.core.users.getNftsById(args)
         .then((nfts) => res.status(StatusCode.SUCCESS).send(nfts))
         .catch(next);
 });
 
 users.get('/:userid/feed', (req: ApiRequest, res: ApiResponse, next: ApiNextFunction) => {
-    const id: string = req.params.userid;
-    const skip: number = req.body.skip ? req.body.skip : 0;
-    const limit: number = req.body.limit ? req.body.limit : 10;
-    const args = { id, pagination: { skip, limit } };
+    const args = { id: req.params.userid, pagination: req.body };
     req.core.users.getFeedById(args)
         .then((nfts) => res.status(StatusCode.SUCCESS).send(nfts))
         .catch(next);
