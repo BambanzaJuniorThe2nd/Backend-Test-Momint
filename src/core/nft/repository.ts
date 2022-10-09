@@ -1,19 +1,15 @@
-import { NFT, NFTRepository, ValidatesNFTs, NFTOwner } from '../types';
 import {
-  ManagesDbs,
-  util,
-  CoreError,
-  ErrorCode,
-  CoreMessage as messages,
-  AccessToken,
-} from '..';
+  NFT,
+  NFTRepository,
+  ValidatesNFTs,
+  NFTOwner,
+  NFTOptions,
+} from '../types';
+import { ManagesDbs, CoreError, ErrorCode, CoreMessage as messages } from '..';
 import { ethers } from 'ethers';
 import { Db, Collection, ObjectId } from 'mongodb';
 
 const COLLECTION = 'nfts';
-const RPC_PROVIDER_URL = 'https://rpc.gnosischain.com/';
-const PRIVATE_KEY =
-  '3288b2b5b16408be5c652d1c935485b5d1d1c9c8a40a460307150c09918ff2fb';
 const nftAbi: any[] = [
   { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
   {
@@ -363,13 +359,21 @@ export class NFTs implements NFTRepository {
   readonly db: Db;
   readonly collection: Collection<NFT>;
   readonly validator: ValidatesNFTs;
+  readonly metamaskKey: string;
+  readonly rpcUrl: string;
   private _indexesCreated: boolean;
 
-  constructor(dbManager: ManagesDbs, validator: ValidatesNFTs) {
+  constructor(
+    dbManager: ManagesDbs,
+    validator: ValidatesNFTs,
+    opts: NFTOptions
+  ) {
     this.dbManager = dbManager;
     this.db = dbManager.mainDb();
     this.collection = this.db.collection(COLLECTION);
     this.validator = validator;
+    this.metamaskKey = opts.metamaskKey;
+    this.rpcUrl = opts.rpcUrl;
     this._indexesCreated = false;
   }
 
@@ -440,8 +444,8 @@ export class NFTs implements NFTRepository {
         );
       }
 
-      const provider = new ethers.providers.JsonRpcProvider(RPC_PROVIDER_URL);
-      const signer = new ethers.Wallet(PRIVATE_KEY, provider);
+      const provider = new ethers.providers.JsonRpcProvider(this.rpcUrl);
+      const signer = new ethers.Wallet(this.metamaskKey, provider);
       const contract = new ethers.Contract(
         nft.contract.address,
         nftAbi,

@@ -6,6 +6,8 @@ export interface CoreConfig {
   dbMain: string;
   dbPrefix: string;
   clientBaseUrl: string;
+  metamaskKey: string;
+  rpcUrl: string;
 }
 
 export interface UserRepository {
@@ -49,6 +51,11 @@ export interface NFTRepository {
   getAll(): Promise<NFT[]>;
   getAllByUserId(userId: string, limit: number): Promise<NFT[]>;
   getOwnerById(id: string): Promise<NFTOwner>;
+}
+
+export interface NFTOptions {
+  metamaskKey: string;
+  rpcUrl: string;
 }
 
 export interface ValidatesNFTs {
